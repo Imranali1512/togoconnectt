@@ -100,7 +100,7 @@ export default function Services() {
           <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: 28, alignItems: 'start' }}>
 
             {/* ── LEFT SIDEBAR ── */}
-            <div style={{ position: 'sticky', top: 80 }}>
+            <div style={{ position: 'sticky', top: 80, maxHeight: 'calc(100vh - 100px)', overflowY: 'auto', paddingRight: 4 }}>
 
               {/* Category */}
               <div style={{ marginBottom: 24 }}>

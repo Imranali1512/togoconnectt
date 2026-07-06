@@ -14,6 +14,22 @@ router.get('/', (req, res) => {
     const params = [];
     if (category) { query += ' AND l.category = ?'; params.push(category); }
     if (city && city !== 'All locations') { query += ' AND l.city LIKE ?'; params.push(`%${city}%`); }
+    if (req.query.region && req.query.region !== 'All regions') {
+      // Filter by all cities in that region
+      const regionCities = {
+        'Région Maritime': ['Lomé','Agoè-Nyivé','Tsévié','Aneho','Vogan','Tabligbo','Kévé','Afagnan','Togblekopé'],
+        'Région des Plateaux': ['Kpalimé','Atakpamé','Notsé','Badou','Anié','Blitta','Amlamé','Tohoun','Wahala'],
+        'Région Centrale': ['Sokodé','Bafilo','Sotouboua','Tchamba','Blitta'],
+        'Région de la Kara': ['Kara','Bassar','Niamtougou','Kandé','Guérin-Kouka','Pagouda'],
+        'Région des Savanes': ['Dapaong','Mango','Sansanné-Mango','Cinkassé','Tandjouaré','Mandouri']
+      };
+      const cities = regionCities[req.query.region];
+      if (cities) {
+        const placeholders = cities.map(() => '?').join(',');
+        query += ` AND l.city IN (${placeholders})`;
+        params.push(...cities);
+      }
+    }
     if (featured) { query += ' AND l.featured = 1'; }
     if (search) {
       query += ' AND (l.title LIKE ? OR l.description LIKE ? OR l.category LIKE ?)';

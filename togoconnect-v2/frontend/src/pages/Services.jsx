@@ -1,16 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
+import { TOGO_LOCATIONS, ALL_REGIONS, SERVICE_CATEGORIES, getCitiesByRegion } from '../data/locations';
 import ListingCard from '../components/ListingCard';
 
-const CATEGORIES = [
-  'All categories','Plumbing','Beauty','Tutoring','Photography',
-  'Tech','Cleaning','Tailoring','Design','Moving'
-];
-
-const LOCATIONS = [
-  'All locations','Lomé','Sokodé','Kara','Kpalimé','Atakpamé','Remote'
-];
+const CATEGORIES = ['All categories', ...SERVICE_CATEGORIES];
 
 const RATINGS = [
   { label: 'Any rating', value: 0 },
@@ -29,10 +23,13 @@ export default function Services() {
     searchParams.get('category') ? [searchParams.get('category')] : []
   );
   const [location, setLocation] = useState('All locations');
+  const [selectedRegion, setSelectedRegion] = useState('All regions');
   const [remoteOnly, setRemoteOnly] = useState(false);
   const [maxPrice, setMaxPrice] = useState(999999999);
   const [minRating, setMinRating] = useState(0);
   const [sortBy, setSortBy] = useState('relevant');
+  const [showAllCats, setShowAllCats] = useState(false);
+  const [showRentals, setShowRentals] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -40,11 +37,12 @@ export default function Services() {
     if (search) params.search = search;
     // category filter handled client-side for multi-select
     if (location !== 'All locations') params.city = location;
+    if (selectedRegion && selectedRegion !== 'All regions') params.region = selectedRegion;
     axios.get('/api/listings', { params })
       .then(r => setListings(r.data))
       .catch(() => setListings([]))
       .finally(() => setLoading(false));
-  }, [search, location]);
+  }, [search, location, selectedRegion]);
 
   const handleCategoryToggle = (cat) => {
     if (cat === 'All categories') {
@@ -105,53 +103,70 @@ export default function Services() {
             <div style={{ position: 'sticky', top: 80 }}>
 
               {/* Category */}
-              <div style={{ marginBottom: 28 }}>
+              <div style={{ marginBottom: 24 }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', letterSpacing: '.04em', textTransform: 'uppercase', marginBottom: 12 }}>Category</div>
-                {CATEGORIES.map(cat => {
-                  const isAll = cat === 'All categories';
-                  const active = isAll ? selectedCategories.length === 0 : selectedCategories.includes(cat);
-                  return (
-                    <div key={cat} style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 8, cursor: 'pointer' }}
-                      onClick={() => handleCategoryToggle(cat)}>
-                      {isAll ? (
-                        <span style={{
-                          display: 'inline-block', width: 14, height: 14, borderRadius: 3,
-                          background: active ? 'var(--green)' : 'transparent',
-                          border: active ? '2px solid var(--green)' : '2px solid #d1d5db',
-                          flexShrink: 0
-                        }} />
-                      ) : (
-                        <span style={{
-                          display: 'inline-block', width: 14, height: 14, borderRadius: 3,
-                          background: active ? 'var(--green)' : 'transparent',
-                          border: active ? '2px solid var(--green)' : '2px solid #d1d5db',
-                          flexShrink: 0
-                        }} />
-                      )}
-                      <span style={{
-                        fontSize: 14, fontWeight: active ? 700 : 400,
-                        color: active ? 'var(--green-dark)' : 'var(--text)'
-                      }}>{cat}</span>
-                    </div>
-                  );
-                })}
+
+                <label style={{ display:'flex', alignItems:'center', gap:8, marginBottom:8, fontSize:14, cursor:'pointer', fontWeight:selectedCategories.length===0?700:400 }}>
+                  <input type="checkbox" checked={selectedCategories.length === 0} onChange={() => setSelectedCategories([])} style={{ accentColor:'var(--green)' }} />
+                  All categories
+                </label>
+
+                {/* Services */}
+                <div style={{ marginBottom:10 }}>
+                  <div style={{ fontSize:11, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'.06em', marginBottom:6, marginTop:4 }}>Services</div>
+                  {['Plumbing','Beauty','Barber','Tutoring','Photography','Tech','Cleaning','Tailoring','Design','Moving','Catering','Electrical','Construction','Mechanic','Legal','Medical','Finance'].slice(0, showAllCats ? 99 : 6).map(cat => (
+                    <label key={cat} style={{ display:'flex', alignItems:'center', gap:8, marginBottom:5, fontSize:13, cursor:'pointer' }}>
+                      <input type="checkbox" checked={selectedCategories.includes(cat)} onChange={() => handleCategoryToggle(cat)} style={{ accentColor:'var(--green)' }} />
+                      {cat}
+                    </label>
+                  ))}
+                  <button onClick={() => setShowAllCats(s => !s)}
+                    style={{ background:'none', border:'none', color:'var(--green-dark)', fontSize:12, fontWeight:600, cursor:'pointer', padding:'3px 0', marginTop:2, display:'flex', alignItems:'center', gap:4 }}>
+                    {showAllCats ? '▲ Show less' : '▼ More services'}
+                  </button>
+                </div>
+
+                {/* Real Estate */}
+                <div>
+                  <button onClick={() => setShowRentals(s => !s)}
+                    style={{ display:'flex', justifyContent:'space-between', width:'100%', background:'none', border:'none', cursor:'pointer', padding:'6px 0', fontSize:11, fontWeight:700, color:showRentals?'var(--green-dark)':'#9ca3af', textTransform:'uppercase', letterSpacing:'.06em', borderTop:'1px solid #f3f4f6' }}>
+                    <span>Real Estate</span>
+                    <span>{showRentals ? '▲' : '▼'}</span>
+                  </button>
+                  {showRentals && ['House Rental','Apartment Rental','Land Rental','Store/Shop Rental','Office Rental','Land for Sale','House for Sale','Apartment for Sale'].map(cat => (
+                    <label key={cat} style={{ display:'flex', alignItems:'center', gap:8, marginBottom:5, fontSize:13, cursor:'pointer' }}>
+                      <input type="checkbox" checked={selectedCategories.includes(cat)} onChange={() => handleCategoryToggle(cat)} style={{ accentColor:'var(--green)' }} />
+                      {cat}
+                    </label>
+                  ))}
+                </div>
               </div>
 
-              {/* Location */}
-              <div style={{ marginBottom: 28 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', letterSpacing: '.04em', textTransform: 'uppercase', marginBottom: 12 }}>Location</div>
-                <select
-                  value={location}
-                  onChange={e => setLocation(e.target.value)}
-                  style={{
-                    width: '100%', border: '1.5px solid var(--border)', borderRadius: 8,
-                    padding: '8px 10px', fontSize: 14, color: 'var(--text)',
-                    background: '#fff', outline: 'none', marginBottom: 10
-                  }}
-                >
-                  {LOCATIONS.map(l => <option key={l}>{l}</option>)}
+              {/* Region */}
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', letterSpacing: '.04em', textTransform: 'uppercase', marginBottom: 10 }}>Region</div>
+                <select value={selectedRegion}
+                  onChange={e => { setSelectedRegion(e.target.value); setLocation('All locations'); }}
+                  style={{ width:'100%', border:'1.5px solid var(--border)', borderRadius:8, padding:'8px 10px', fontSize:14, color:'var(--text)', background:'#fff', outline:'none' }}>
+                  <option value="All regions">All regions</option>
+                  {ALL_REGIONS.map(r => <option key={r} value={r}>{r === 'Région Maritime' ? 'Maritime (Lomé)' :
+                     r === 'Région des Plateaux' ? 'Plateaux' :
+                     r === 'Région Centrale' ? 'Centrale' :
+                     r === 'Région de la Kara' ? 'Kara' :
+                     r === 'Région des Savanes' ? 'Savanes' : r}</option>)}
                 </select>
-                <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, cursor: 'pointer' }}>
+              </div>
+
+              {/* City */}
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', letterSpacing: '.04em', textTransform: 'uppercase', marginBottom: 10 }}>City</div>
+                <select value={location}
+                  onChange={e => setLocation(e.target.value)}
+                  style={{ width:'100%', border:'1.5px solid var(--border)', borderRadius:8, padding:'8px 10px', fontSize:14, color:'var(--text)', background:'#fff', outline:'none', marginBottom:10 }}>
+                  <option value="All locations">All cities</option>
+                  {getCitiesByRegion(selectedRegion).map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+                <label style={{ display:'flex', alignItems:'center', gap:8, fontSize:14, cursor:'pointer' }}>
                   <input type="checkbox" checked={remoteOnly} onChange={e => setRemoteOnly(e.target.checked)} />
                   Remote only
                 </label>

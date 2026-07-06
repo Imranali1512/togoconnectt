@@ -1,105 +1,116 @@
-export const LOCATIONS = {
-  "Afghanistan": ["Kabul","Kandahar","Herat","Mazar-i-Sharif","Kunduz","Jalalabad"],
-  "Albania": ["Tirana","Durrës","Vlorë","Shkodër","Fier","Korçë"],
-  "Algeria": ["Algiers","Oran","Constantine","Annaba","Blida","Batna"],
-  "Argentina": ["Buenos Aires","Córdoba","Rosario","Mendoza","La Plata","Tucumán"],
-  "Australia": ["Sydney","Melbourne","Brisbane","Perth","Adelaide","Canberra","Darwin","Hobart"],
-  "Austria": ["Vienna","Graz","Linz","Salzburg","Innsbruck","Klagenfurt"],
-  "Azerbaijan": ["Baku","Ganja","Sumqayit","Mingachevir","Nakhchivan"],
-  "Bangladesh": ["Dhaka","Chittagong","Sylhet","Rajshahi","Khulna","Comilla","Mymensingh"],
-  "Belgium": ["Brussels","Antwerp","Ghent","Charleroi","Liège","Bruges"],
-  "Benin": ["Cotonou","Porto-Novo","Parakou","Abomey","Bohicon","Natitingou","Ouidah"],
-  "Bolivia": ["La Paz","Santa Cruz","Cochabamba","Sucre","Oruro","Potosí"],
-  "Bosnia and Herzegovina": ["Sarajevo","Banja Luka","Tuzla","Zenica","Mostar"],
-  "Brazil": ["São Paulo","Rio de Janeiro","Brasília","Salvador","Fortaleza","Belo Horizonte","Manaus","Curitiba","Recife","Porto Alegre"],
-  "Bulgaria": ["Sofia","Plovdiv","Varna","Burgas","Ruse","Stara Zagora"],
-  "Burkina Faso": ["Ouagadougou","Bobo-Dioulasso","Koudougou","Banfora","Ouahigouya"],
-  "Cameroon": ["Yaoundé","Douala","Garoua","Bamenda","Bafoussam","Maroua","Ngaoundéré"],
-  "Canada": ["Toronto","Montreal","Vancouver","Calgary","Edmonton","Ottawa","Quebec City","Winnipeg","Halifax"],
-  "Chile": ["Santiago","Valparaíso","Concepción","La Serena","Antofagasta","Temuco"],
-  "China": ["Beijing","Shanghai","Guangzhou","Shenzhen","Chengdu","Wuhan","Xi'an","Hangzhou","Nanjing","Tianjin"],
-  "Colombia": ["Bogotá","Medellín","Cali","Barranquilla","Cartagena","Cúcuta","Bucaramanga"],
-  "Congo (DRC)": ["Kinshasa","Lubumbashi","Mbuji-Mayi","Kisangani","Goma","Bukavu","Kolwezi"],
-  "Côte d'Ivoire": ["Abidjan","Yamoussoukro","Bouaké","Daloa","San-Pédro","Korhogo","Man"],
-  "Croatia": ["Zagreb","Split","Rijeka","Osijek","Zadar","Pula"],
-  "Cuba": ["Havana","Santiago de Cuba","Camagüey","Holguín","Santa Clara"],
-  "Czech Republic": ["Prague","Brno","Ostrava","Plzeň","Liberec","Olomouc"],
-  "Denmark": ["Copenhagen","Aarhus","Odense","Aalborg","Esbjerg","Randers"],
-  "Ecuador": ["Quito","Guayaquil","Cuenca","Santo Domingo","Machala","Durán"],
-  "Egypt": ["Cairo","Alexandria","Giza","Shubra El Kheima","Port Said","Suez","Luxor","Aswan"],
-  "Ethiopia": ["Addis Ababa","Dire Dawa","Mek'ele","Gondar","Hawassa","Bahir Dar","Jimma"],
-  "Finland": ["Helsinki","Espoo","Tampere","Vantaa","Oulu","Turku","Jyväskylä"],
-  "France": ["Paris","Marseille","Lyon","Toulouse","Nice","Nantes","Strasbourg","Montpellier","Bordeaux","Lille"],
-  "Germany": ["Berlin","Hamburg","Munich","Cologne","Frankfurt","Stuttgart","Düsseldorf","Leipzig","Dortmund","Dresden"],
-  "Ghana": ["Accra","Kumasi","Tamale","Takoradi","Cape Coast","Ho","Sunyani","Koforidua","Wa"],
-  "Greece": ["Athens","Thessaloniki","Patras","Heraklion","Larissa","Volos"],
-  "Guatemala": ["Guatemala City","Mixco","Villa Nueva","Quetzaltenango","San Miguel Petapa"],
-  "Guinea": ["Conakry","Nzérékoré","Kankan","Kindia","Labé","Siguiri"],
-  "Hungary": ["Budapest","Debrecen","Miskolc","Szeged","Pécs","Győr"],
-  "India": ["Mumbai","Delhi","Bangalore","Hyderabad","Chennai","Kolkata","Pune","Ahmedabad","Surat","Jaipur","Lucknow","Kanpur","Nagpur","Indore","Bhopal","Visakhapatnam","Patna","Vadodara","Agra","Nashik"],
-  "Indonesia": ["Jakarta","Surabaya","Bandung","Medan","Semarang","Makassar","Palembang","Tangerang","Depok","Bekasi","Yogyakarta","Bogor"],
-  "Iran": ["Tehran","Mashhad","Isfahan","Karaj","Shiraz","Tabriz","Qom","Ahvaz"],
-  "Iraq": ["Baghdad","Basra","Mosul","Erbil","Kirkuk","Najaf","Karbala"],
-  "Ireland": ["Dublin","Cork","Limerick","Galway","Waterford","Drogheda"],
-  "Israel": ["Jerusalem","Tel Aviv","Haifa","Rishon LeZion","Petah Tikva","Ashdod","Netanya"],
-  "Italy": ["Rome","Milan","Naples","Turin","Palermo","Genoa","Bologna","Florence","Bari","Venice"],
-  "Japan": ["Tokyo","Osaka","Nagoya","Sapporo","Fukuoka","Kobe","Kyoto","Yokohama","Hiroshima","Sendai"],
-  "Jordan": ["Amman","Zarqa","Irbid","Russeifa","Wadi as-Sir","Aqaba"],
-  "Kazakhstan": ["Nur-Sultan","Almaty","Shymkent","Aktobe","Karaganda","Taraz"],
-  "Kenya": ["Nairobi","Mombasa","Kisumu","Nakuru","Eldoret","Thika","Malindi"],
-  "Kuwait": ["Kuwait City","Salmiya","Hawalli","Farwaniya","Jahra","Ahmadi"],
-  "Libya": ["Tripoli","Benghazi","Misrata","Tarhuna","Al Khums","Zawiya"],
-  "Madagascar": ["Antananarivo","Toamasina","Antsirabe","Fianarantsoa","Mahajanga","Toliara"],
-  "Malaysia": ["Kuala Lumpur","George Town","Johor Bahru","Ipoh","Shah Alam","Petaling Jaya","Subang Jaya","Kota Kinabalu","Kuching"],
-  "Mali": ["Bamako","Sikasso","Mopti","Koutiala","Kayes","Gao","Timbuktu"],
-  "Mexico": ["Mexico City","Guadalajara","Monterrey","Puebla","Tijuana","León","Ciudad Juárez","Zapopan","Mérida","Cancún"],
-  "Morocco": ["Casablanca","Rabat","Fes","Marrakech","Agadir","Tangier","Meknes","Oujda","Kenitra","Tetouan"],
-  "Mozambique": ["Maputo","Matola","Beira","Nampula","Chimoio","Nacala","Quelimane"],
-  "Myanmar": ["Yangon","Mandalay","Naypyidaw","Mawlamyine","Bago","Pathein"],
-  "Nepal": ["Kathmandu","Pokhara","Lalitpur","Bhaktapur","Biratnagar","Birgunj","Dharan"],
-  "Netherlands": ["Amsterdam","Rotterdam","The Hague","Utrecht","Eindhoven","Tilburg","Groningen"],
-  "New Zealand": ["Auckland","Wellington","Christchurch","Hamilton","Tauranga","Napier-Hastings","Dunedin"],
-  "Niger": ["Niamey","Zinder","Maradi","Tahoua","Agadez","Dosso","Diffa"],
-  "Nigeria": ["Lagos","Abuja","Kano","Ibadan","Port Harcourt","Benin City","Enugu","Kaduna","Maiduguri","Zaria","Ilorin","Jos","Aba","Abeokuta","Owerri","Warri","Onitsha"],
-  "Norway": ["Oslo","Bergen","Trondheim","Stavanger","Drammen","Fredrikstad"],
-  "Oman": ["Muscat","Salalah","Seeb","Nizwa","Sohar","Sur"],
-  "Pakistan": ["Karachi","Lahore","Islamabad","Rawalpindi","Faisalabad","Multan","Hyderabad","Gujranwala","Peshawar","Quetta","Sialkot","Bahawalpur","Sargodha","Sukkur","Larkana","Sheikhupura","Rahim Yar Khan","Jhang","Mardan","Gujrat","Kasur","Mingora","Sahiwal","Okara","Mirpur Khas"],
-  "Peru": ["Lima","Arequipa","Trujillo","Chiclayo","Piura","Iquitos","Cusco"],
-  "Philippines": ["Manila","Quezon City","Cebu City","Davao City","Zamboanga","Antipolo","Pasig","Taguig","Cagayan de Oro","Makati"],
-  "Poland": ["Warsaw","Kraków","Łódź","Wrocław","Poznań","Gdańsk","Szczecin","Bydgoszcz"],
-  "Portugal": ["Lisbon","Porto","Braga","Coimbra","Funchal","Setúbal","Almada"],
-  "Qatar": ["Doha","Al Rayyan","Umm Salal","Al Wakrah","Al Khor","Dukhan"],
-  "Romania": ["Bucharest","Cluj-Napoca","Timișoara","Iași","Constanța","Craiova","Brașov"],
-  "Russia": ["Moscow","Saint Petersburg","Novosibirsk","Yekaterinburg","Nizhny Novgorod","Kazan","Chelyabinsk","Omsk","Samara","Rostov-on-Don"],
-  "Saudi Arabia": ["Riyadh","Jeddah","Mecca","Medina","Dammam","Ta'if","Tabuk","Qatif","Al-Ahsa","Jizan"],
-  "Senegal": ["Dakar","Thiès","Saint-Louis","Ziguinchor","Kaolack","Mbour","Diourbel","Touba","Tambacounda"],
-  "Sierra Leone": ["Freetown","Bo","Kenema","Makeni","Koidu"],
-  "Somalia": ["Mogadishu","Hargeisa","Kismayo","Bosaso","Baidoa","Berbera"],
-  "South Africa": ["Johannesburg","Cape Town","Durban","Pretoria","Port Elizabeth","Bloemfontein","East London","Nelspruit","Polokwane","Kimberley"],
-  "South Korea": ["Seoul","Busan","Incheon","Daegu","Daejeon","Gwangju","Suwon","Ulsan","Changwon"],
-  "Spain": ["Madrid","Barcelona","Valencia","Seville","Zaragoza","Málaga","Murcia","Palma","Las Palmas","Bilbao"],
-  "Sri Lanka": ["Colombo","Kandy","Galle","Negombo","Trincomalee","Jaffna","Anuradhapura"],
-  "Sudan": ["Khartoum","Omdurman","Khartoum North","Port Sudan","Kassala","El Obeid","Wad Medani"],
-  "Sweden": ["Stockholm","Gothenburg","Malmö","Uppsala","Västerås","Örebro","Linköping"],
-  "Switzerland": ["Zurich","Geneva","Basel","Bern","Lausanne","Winterthur","St. Gallen"],
-  "Syria": ["Damascus","Aleppo","Homs","Latakia","Hama","Deir ez-Zor"],
-  "Tanzania": ["Dar es Salaam","Dodoma","Mwanza","Arusha","Mbeya","Morogoro","Tanga","Zanzibar City"],
-  "Thailand": ["Bangkok","Chiang Mai","Nonthaburi","Pak Kret","Hat Yai","Udon Thani","Pattaya","Khon Kaen","Nakhon Ratchasima"],
-  "Togo": ["Lomé","Sokodé","Kara","Kpalimé","Atakpamé","Tsévié","Notsé","Bassar","Dapaong","Mango","Aného","Vogan","Tabligbo"],
-  "Tunisia": ["Tunis","Sfax","Sousse","Kairouan","Bizerte","Gabès","Ariana","Gafsa"],
-  "Turkey": ["Istanbul","Ankara","Izmir","Bursa","Adana","Gaziantep","Konya","Antalya","Kayseri","Diyarbakır"],
-  "Uganda": ["Kampala","Gulu","Lira","Mbarara","Jinja","Mbale","Masaka","Entebbe"],
-  "Ukraine": ["Kyiv","Kharkiv","Odessa","Dnipro","Zaporizhzhia","Lviv","Kryvyi Rih","Mykolaiv"],
-  "United Arab Emirates": ["Dubai","Abu Dhabi","Sharjah","Al Ain","Ajman","Ras Al Khaimah","Fujairah"],
-  "United Kingdom": ["London","Birmingham","Manchester","Glasgow","Leeds","Liverpool","Sheffield","Bristol","Edinburgh","Cardiff","Belfast","Newcastle"],
-  "United States": ["New York","Los Angeles","Chicago","Houston","Phoenix","Philadelphia","San Antonio","San Diego","Dallas","San Jose","Austin","Jacksonville","Fort Worth","Columbus","Charlotte","Indianapolis","San Francisco","Seattle","Denver","Nashville","Oklahoma City","El Paso","Washington DC","Boston","Las Vegas","Portland","Miami","Atlanta"],
-  "Uzbekistan": ["Tashkent","Samarkand","Namangan","Andijan","Bukhara","Nukus","Fergana"],
-  "Venezuela": ["Caracas","Maracaibo","Valencia","Barquisimeto","Maracay","Ciudad Guayana"],
-  "Vietnam": ["Ho Chi Minh City","Hanoi","Da Nang","Haiphong","Can Tho","Bien Hoa","Nha Trang","Hue"],
-  "Yemen": ["Sanaa","Aden","Taiz","Hudaydah","Mukalla","Ibb","Dhamar"],
-  "Zambia": ["Lusaka","Kitwe","Ndola","Livingstone","Kabwe","Chipata"],
-  "Zimbabwe": ["Harare","Bulawayo","Chitungwiza","Mutare","Gweru","Kwekwe","Kadoma"],
-  "Remote / Online": ["Remote / Online — Worldwide"],
+// Togo Complete Location Data
+export const TOGO_LOCATIONS = {
+  'Région Maritime': {
+    provinces: {
+      'Lomé Commune': ['Lomé', 'Agoè-Nyivé', 'Bè', 'Togblekopé'],
+      'Golfe': ['Aného', 'Tsévié', 'Kpalimé', 'Vogan'],
+      'Lacs': ['Aneho', 'Tabligbo', 'Vogan'],
+      'Vo': ['Vogan', 'Akoumapé'],
+      'Yoto': ['Tabligbo', 'Hahotoé'],
+      'Zio': ['Tsévié', 'Kévé'],
+      'Bas-Mono': ['Afagnan'],
+    },
+    cities: ['Lomé', 'Agoè-Nyivé', 'Tsévié', 'Aneho', 'Vogan', 'Tabligbo', 'Kévé', 'Afagnan', 'Togblekopé']
+  },
+  'Région des Plateaux': {
+    provinces: {
+      'Kloto': ['Kpalimé', 'Kuma-Dunyo'],
+      'Haho': ['Notsé', 'Wahala'],
+      'Moyen-Mono': ['Atakpamé', 'Anié'],
+      'Ogou': ['Atakpamé'],
+      'Anié': ['Anié', 'Blitta'],
+      'Wawa': ['Badou'],
+      'Amou': ['Amlamé'],
+      'Est-Mono': ['Tohoun'],
+    },
+    cities: ['Kpalimé', 'Atakpamé', 'Notsé', 'Badou', 'Anié', 'Blitta', 'Amlamé', 'Tohoun', 'Wahala']
+  },
+  'Région Centrale': {
+    provinces: {
+      'Sotouboua': ['Sotouboua'],
+      'Tchamba': ['Tchamba'],
+      'Tchaoudjo': ['Sokodé'],
+      'Mô': ['Bafilo'],
+    },
+    cities: ['Sokodé', 'Bafilo', 'Sotouboua', 'Tchamba']
+  },
+  'Région de la Kara': {
+    provinces: {
+      'Bassar': ['Bassar'],
+      'Binah': ['Pagouda'],
+      'Dankpen': ['Guérin-Kouka'],
+      'Doufelgou': ['Niamtougou'],
+      'Kozah': ['Kara'],
+      'Kéran': ['Kandé'],
+    },
+    cities: ['Kara', 'Bassar', 'Niamtougou', 'Kandé', 'Guérin-Kouka', 'Pagouda']
+  },
+  'Région des Savanes': {
+    provinces: {
+      'Cinkassé': ['Cinkassé'],
+      'Kpendjal': ['Mandouri'],
+      'Oti': ['Mango', 'Sansanné-Mango'],
+      'Tône': ['Dapaong'],
+      'Tandjouaré': ['Tandjouaré'],
+    },
+    cities: ['Dapaong', 'Mango', 'Sansanné-Mango', 'Cinkassé', 'Tandjouaré', 'Mandouri']
+  }
 };
 
-export const COUNTRIES = Object.keys(LOCATIONS).sort();
+export const ALL_REGIONS = Object.keys(TOGO_LOCATIONS);
+
+export const ALL_CITIES = [
+  'Remote / Online',
+  ...Object.values(TOGO_LOCATIONS).flatMap(r => r.cities)
+].sort();
+
+export const getCitiesByRegion = (region) => {
+  if (!region || region === 'All regions') return ALL_CITIES;
+  return TOGO_LOCATIONS[region]?.cities || [];
+};
+
+// Rental categories
+export const RENTAL_CATEGORIES = [
+  'House Rental',
+  'Apartment Rental',
+  'Land Rental',
+  'Store/Shop Rental',
+  'Office Rental',
+  'Land for Sale',
+  'House for Sale',
+  'Apartment for Sale',
+];
+
+export const SERVICE_CATEGORIES = [
+  'Plumbing',
+  'Beauty',
+  'Barber',
+  'Tutoring',
+  'Photography',
+  'Tech',
+  'Cleaning',
+  'Tailoring',
+  'Design',
+  'Moving',
+  'Catering',
+  'Electrical',
+  'Construction',
+  'Mechanic',
+  'Legal',
+  'Medical',
+  'Finance',
+  ...RENTAL_CATEGORIES,
+  'Other',
+];
+
+// Legacy exports for Signup.jsx compatibility
+export const COUNTRIES = ['Togo', 'Ghana', 'Benin', 'Nigeria', 'Cote dIvoire', 'Burkina Faso', 'Other'];
+
+export const LOCATIONS = [
+  'Lomé', 'Agoè-Nyivé', 'Tsévié', 'Aneho', 'Vogan', 'Tabligbo',
+  'Kpalimé', 'Atakpamé', 'Notsé', 'Badou', 'Anié',
+  'Sokodé', 'Bafilo', 'Sotouboua',
+  'Kara', 'Bassar', 'Niamtougou',
+  'Dapaong', 'Mango', 'Cinkassé',
+  'Remote / Online'
+];

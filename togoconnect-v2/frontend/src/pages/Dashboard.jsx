@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { TOGO_LOCATIONS, ALL_REGIONS, SERVICE_CATEGORIES, getCitiesByRegion } from '../data/locations';
 
 const PLAN_INFO = {
   none:     { label: 'Free',     color: '#9ca3af', bg: '#f9fafb', limit: 0,           textColor: '#6b7280' },
@@ -9,8 +10,8 @@ const PLAN_INFO = {
   standard: { label: 'Standard', color: '#0f6e56', bg: '#ecfdf5', limit: 10,          textColor: '#0f6e56' },
   premium:  { label: 'Premium',  color: '#7c3aed', bg: '#f5f3ff', limit: 'Unlimited', textColor: '#7c3aed' },
 };
-const CATEGORIES = ['Plumbing','Beauty','Tutoring','Photography','Tech','Cleaning','Tailoring','Design','Moving','Barber','Other'];
-const CITIES = ['Lome','Sokode','Kara','Kpalime','Atakpame'];
+// Categories and cities from locations data
+const CATEGORIES = SERVICE_CATEGORIES;
 
 // ── Small reusable input ──
 const Field = ({ label, value, onChange, type='text', placeholder='', as='input' }) => (
@@ -391,14 +392,15 @@ function OverviewTab({ myListings, pi, atLimit, unread, goTab, user, billingStat
 // ── Listings Tab ──
 function ListingsTab({ myListings, pi, atLimit, refreshListings }) {
   const navigate = useNavigate();
-  const EMPTY_FORM = { title:'', description:'', category:'Plumbing', price:'', price_type:'fixed', city:'Lome', is_remote:false };
+  const EMPTY_FORM = { title:'', description:'', category:'Plumbing', price:'', price_type:'fixed', city:'Lomé', is_remote:false };
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
-  const [images, setImages] = useState([]); // array of {url, file?, preview}
+  const [images, setImages] = useState([]);
   const [editId, setEditId] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [listingRegion, setListingRegion] = useState('Région Maritime');
   const fileRef = useRef();
 
   const set = (k, v) => setForm(p => ({...p, [k]: v}));
@@ -442,6 +444,9 @@ function ListingsTab({ myListings, pi, atLimit, refreshListings }) {
 
   const handleEdit = async (l) => {
     setForm({ title:l.title, description:l.description, category:l.category, price:l.price, price_type:l.price_type, city:l.city, is_remote:!!l.is_remote });
+    // Set region based on city
+    const cityRegion = Object.entries(TOGO_LOCATIONS).find(([, v]) => v.cities.includes(l.city))?.[0] || 'Région Maritime';
+    setListingRegion(cityRegion);
     // Load existing images
     try {
       const r = await axios.get(`/api/listings/${l.id}`);
@@ -501,10 +506,18 @@ function ListingsTab({ myListings, pi, atLimit, refreshListings }) {
               )}
             </div>
             <div>
+              <label style={{ fontSize:13, fontWeight:600, color:'#374151', display:'block', marginBottom:6 }}>Region</label>
+              <select value={listingRegion}
+                onChange={e => { setListingRegion(e.target.value); set('city', getCitiesByRegion(e.target.value)[0] || 'Lomé'); }}
+                style={{ width:'100%', border:'1.5px solid #d1d5db', borderRadius:8, padding:'9px 12px', fontSize:14, background:'#fff' }}>
+                {ALL_REGIONS.map(r => <option key={r} value={r}>{r.replace('Région ','')}</option>)}
+              </select>
+            </div>
+            <div>
               <label style={{ fontSize:13, fontWeight:600, color:'#374151', display:'block', marginBottom:6 }}>City</label>
               <select value={form.city} onChange={e=>set('city',e.target.value)}
                 style={{ width:'100%', border:'1.5px solid #d1d5db', borderRadius:8, padding:'9px 12px', fontSize:14, background:'#fff' }}>
-                {CITIES.map(c=><option key={c}>{c}</option>)}
+                {getCitiesByRegion(listingRegion).map(c=><option key={c} value={c}>{c}</option>)}
               </select>
             </div>
             <div>

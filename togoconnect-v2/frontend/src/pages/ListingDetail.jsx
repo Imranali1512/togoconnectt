@@ -84,6 +84,14 @@ export default function ListingDetail() {
 
   // Review form state
   const [reportSent, setReportSent] = useState(false);
+  const [showBooking, setShowBooking] = useState(false);
+  const [bookingMsg, setBookingMsg] = useState('');
+  const [bookingDate, setBookingDate] = useState('');
+  const [bookingSent, setBookingSent] = useState(false);
+  const [bookingName, setBookingName] = useState(user?.name || '');
+  const [bookingEmail, setBookingEmail] = useState(user?.email || '');
+  const [bookingPhone, setBookingPhone] = useState('');
+  const [bookingTime, setBookingTime] = useState('');
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportCategory, setReportCategory] = useState('');
   const [reportDetail, setReportDetail] = useState('');
@@ -242,6 +250,127 @@ export default function ListingDetail() {
               <p className="listing-detail-desc">{listing.description || 'No description provided.'}</p>
             </div>
 
+      {/* Book Meeting Modal */}
+      {showBooking && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.55)', zIndex:9999, display:'flex', alignItems:'center', justifyContent:'center', padding:20 }}
+          onClick={() => { setShowBooking(false); setBookingSent(false); }}>
+          <div style={{ background:'#fff', borderRadius:20, maxWidth:540, width:'100%', boxShadow:'0 24px 80px rgba(0,0,0,.2)', overflow:'hidden', maxHeight:'90vh', overflowY:'auto' }}
+            onClick={e => e.stopPropagation()}>
+
+            {/* Header */}
+            <div style={{ background:'linear-gradient(135deg,#0f6e56,#1D9E75)', padding:'22px 28px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+              <div>
+                <div style={{ fontSize:11, color:'rgba(255,255,255,.7)', fontWeight:700, letterSpacing:'.06em', textTransform:'uppercase', marginBottom:3 }}>Service Booking</div>
+                <h3 style={{ fontSize:18, fontWeight:800, color:'#fff', margin:0 }}>Request a Meeting</h3>
+              </div>
+              <button onClick={() => { setShowBooking(false); setBookingSent(false); }}
+                style={{ background:'rgba(255,255,255,.2)', border:'none', color:'#fff', width:34, height:34, borderRadius:'50%', fontSize:18, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>×</button>
+            </div>
+
+            {bookingSent ? (
+              <div style={{ textAlign:'center', padding:'40px 28px' }}>
+                <div style={{ width:70, height:70, borderRadius:'50%', background:'#ecfdf5', border:'3px solid #86efac', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 18px', fontSize:32 }}>✅</div>
+                <h4 style={{ fontSize:18, fontWeight:800, color:'#0f1923', marginBottom:8 }}>Request Sent!</h4>
+                <p style={{ fontSize:14, color:'#6b7280', lineHeight:1.7, marginBottom:24 }}>
+                  The seller has been notified and will respond shortly. Track your booking in <strong>Dashboard → Bookings</strong>.
+                </p>
+                <button onClick={() => { setShowBooking(false); setBookingSent(false); }} className="btn-primary" style={{ padding:'11px 32px' }}>Done</button>
+              </div>
+            ) : (
+              <div style={{ padding:'24px 28px' }}>
+
+                {/* Service info */}
+                <div style={{ background:'#f9fafb', borderRadius:10, padding:'11px 14px', marginBottom:20, display:'flex', alignItems:'center', gap:10, border:'1px solid #f3f4f6' }}>
+                  <span style={{ fontSize:22 }}>🔧</span>
+                  <div>
+                    <div style={{ fontSize:13, fontWeight:700, color:'#0f1923' }}>{listing?.title}</div>
+                    <div style={{ fontSize:12, color:'#9ca3af' }}>by {listing?.seller_name} · {listing?.city}</div>
+                  </div>
+                </div>
+
+                {/* Name + Email */}
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginBottom:12 }}>
+                  <div>
+                    <label style={{ fontSize:11, fontWeight:700, color:'#6b7280', display:'block', marginBottom:5, textTransform:'uppercase', letterSpacing:'.05em' }}>Your Name *</label>
+                    <input type="text" value={bookingName} onChange={e=>setBookingName(e.target.value)} placeholder="Full name"
+                      style={{ width:'100%', border:'1.5px solid #e5e7eb', borderRadius:8, padding:'9px 12px', fontSize:13, outline:'none', boxSizing:'border-box' }}
+                      onFocus={e=>e.target.style.borderColor='#1D9E75'} onBlur={e=>e.target.style.borderColor='#e5e7eb'} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize:11, fontWeight:700, color:'#6b7280', display:'block', marginBottom:5, textTransform:'uppercase', letterSpacing:'.05em' }}>Email *</label>
+                    <input type="email" value={bookingEmail} onChange={e=>setBookingEmail(e.target.value)} placeholder="your@email.com"
+                      style={{ width:'100%', border:'1.5px solid #e5e7eb', borderRadius:8, padding:'9px 12px', fontSize:13, outline:'none', boxSizing:'border-box' }}
+                      onFocus={e=>e.target.style.borderColor='#1D9E75'} onBlur={e=>e.target.style.borderColor='#e5e7eb'} />
+                  </div>
+                </div>
+
+                {/* Phone + Date */}
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginBottom:12 }}>
+                  <div>
+                    <label style={{ fontSize:11, fontWeight:700, color:'#6b7280', display:'block', marginBottom:5, textTransform:'uppercase', letterSpacing:'.05em' }}>Phone Number</label>
+                    <input type="tel" value={bookingPhone} onChange={e=>setBookingPhone(e.target.value)} placeholder="+228 XX XX XX XX"
+                      style={{ width:'100%', border:'1.5px solid #e5e7eb', borderRadius:8, padding:'9px 12px', fontSize:13, outline:'none', boxSizing:'border-box' }}
+                      onFocus={e=>e.target.style.borderColor='#1D9E75'} onBlur={e=>e.target.style.borderColor='#e5e7eb'} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize:11, fontWeight:700, color:'#6b7280', display:'block', marginBottom:5, textTransform:'uppercase', letterSpacing:'.05em' }}>Preferred Date *</label>
+                    <input type="date" value={bookingDate} onChange={e=>setBookingDate(e.target.value)}
+                      min={new Date().toISOString().split('T')[0]}
+                      style={{ width:'100%', border:'1.5px solid #e5e7eb', borderRadius:8, padding:'9px 12px', fontSize:13, outline:'none', boxSizing:'border-box', color:'#374151' }}
+                      onFocus={e=>e.target.style.borderColor='#1D9E75'} onBlur={e=>e.target.style.borderColor='#e5e7eb'} />
+                  </div>
+                </div>
+
+                {/* Time preference */}
+                <div style={{ marginBottom:14 }}>
+                  <label style={{ fontSize:11, fontWeight:700, color:'#6b7280', display:'block', marginBottom:8, textTransform:'uppercase', letterSpacing:'.05em' }}>Preferred Time</label>
+                  <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+                    {['Morning (8–11am)', 'Afternoon (12–3pm)', 'Evening (4–7pm)', 'Flexible'].map(t => (
+                      <button key={t} type="button" onClick={()=>setBookingTime(bookingTime===t?'':t)}
+                        style={{ padding:'6px 14px', borderRadius:20, border:`1.5px solid ${bookingTime===t?'#1D9E75':'#e5e7eb'}`, background:bookingTime===t?'#f0fdf4':'#fff', color:bookingTime===t?'#0f6e56':'#6b7280', fontSize:12, fontWeight:bookingTime===t?700:400, cursor:'pointer', transition:'all .15s' }}>
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Requirements */}
+                <div style={{ marginBottom:20 }}>
+                  <label style={{ fontSize:11, fontWeight:700, color:'#6b7280', display:'block', marginBottom:5, textTransform:'uppercase', letterSpacing:'.05em' }}>Requirements / Details *</label>
+                  <textarea value={bookingMsg} onChange={e=>setBookingMsg(e.target.value)}
+                    placeholder="Describe what you need, location, special requirements, budget expectations..."
+                    rows={3} style={{ width:'100%', border:'1.5px solid #e5e7eb', borderRadius:8, padding:'10px 12px', fontSize:13, boxSizing:'border-box', resize:'vertical', fontFamily:'inherit', outline:'none', lineHeight:1.6 }}
+                    onFocus={e=>e.target.style.borderColor='#1D9E75'} onBlur={e=>e.target.style.borderColor='#e5e7eb'} />
+                </div>
+
+                <div style={{ display:'flex', gap:10 }}>
+                  <button
+                    disabled={!bookingName||!bookingEmail||!bookingDate||!bookingMsg}
+                    onClick={async () => {
+                      const phonePart = bookingPhone ? "\nPhone: " + bookingPhone : "";
+                      const timePart = bookingTime ? "\nTime: " + bookingTime : "";
+                      const fullMsg = "Name: " + bookingName + "\nEmail: " + bookingEmail + phonePart + "\nDate: " + bookingDate + timePart + "\n\nRequirements:\n" + bookingMsg;
+                      try {
+                        await axios.post('/api/bookings', { seller_id:listing.seller_id, listing_id:listing.id, message:fullMsg, meeting_date:bookingDate });
+                        setBookingSent(true);
+                      } catch(err) { alert(err.response?.data?.message || 'Failed. Please try again.'); }
+                    }}
+                    className="btn-primary"
+                    style={{ flex:1, padding:'12px', fontSize:14, opacity:(!bookingName||!bookingEmail||!bookingDate||!bookingMsg)?0.5:1 }}>
+                    Send Meeting Request
+                  </button>
+                  <button onClick={() => setShowBooking(false)}
+                    style={{ padding:'12px 20px', border:'1.5px solid #e5e7eb', borderRadius:8, background:'#fff', cursor:'pointer', fontSize:14, color:'#6b7280' }}>
+                    Cancel
+                  </button>
+                </div>
+                <p style={{ fontSize:11, color:'#9ca3af', textAlign:'center', marginTop:12 }}>Fields marked * are required</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Delete Review Confirm Modal */}
       {deleteConfirm && (
         <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.45)', zIndex:9999, display:'flex', alignItems:'center', justifyContent:'center', padding:20 }}
@@ -271,6 +400,10 @@ export default function ListingDetail() {
           </div>
         </div>
       )}
+
+
+      {/* Book Meeting Modal */}
+      
 
       {/* Report Modal */}
       {showReportModal && (
@@ -492,6 +625,18 @@ export default function ListingDetail() {
                   {user && (
                     <button onClick={() => navigate('/dashboard')} style={{ width: '100%', marginTop: 8, padding: '10px', border: '1.5px solid var(--border)', borderRadius: 8, background: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: 'var(--green-dark)' }}>
                       📥 View all chats
+                    </button>
+                  )}
+                  {user && listing && user.id !== listing.seller_id && (
+                    <button onClick={() => setShowBooking(true)}
+                      style={{ width:'100%', marginTop:8, padding:'12px', border:'1.5px solid var(--green)', borderRadius:8, background:'#fff', color:'var(--green-dark)', fontWeight:700, fontSize:14, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
+                      📅 Request a Meeting
+                    </button>
+                  )}
+                  {!user && (
+                    <button onClick={() => navigate('/login')}
+                      style={{ width:'100%', marginTop:8, padding:'12px', border:'1.5px solid var(--green)', borderRadius:8, background:'#fff', color:'var(--green-dark)', fontWeight:700, fontSize:14, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
+                      📅 Request a Meeting
                     </button>
                   )}
                 </>

@@ -32,8 +32,9 @@ router.get('/', (req, res) => {
     }
     if (featured) { query += ' AND l.featured = 1'; }
     if (search) {
-      query += ' AND (l.title LIKE ? OR l.description LIKE ? OR l.category LIKE ?)';
-      params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+      query += ' AND (l.title LIKE ? OR l.description LIKE ? OR l.category LIKE ? OR l.seller_name LIKE ? OR l.city LIKE ?)';
+      const s = `%${search}%`;
+      params.push(s, s, s, s, s);
     }
     query += ' ORDER BY l.featured DESC, l.created_at DESC';
     const listings = db.prepare(query).all(...params);

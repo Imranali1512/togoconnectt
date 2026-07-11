@@ -8,8 +8,8 @@ const PLANS = [
     name: 'Basic',
     badge: '🔑',
     tagline: 'Perfect to get started',
-    monthly: 2500,
-    yearly: 1800,
+    monthly: 500,
+    yearly: 417,
     listings: 1,
     features: [
       { text: '1 service listing', ok: true },
@@ -28,8 +28,8 @@ const PLANS = [
     name: 'Standard',
     badge: '⚡',
     tagline: 'Best for growing sellers',
-    monthly: 9900,
-    yearly: 6900,
+    monthly: 4900,
+    yearly: 4083,
     listings: 10,
     popular: true,
     features: [
@@ -49,8 +49,8 @@ const PLANS = [
     name: 'Premium',
     badge: '👑',
     tagline: 'Unlimited growth, maximum visibility',
-    monthly: 24900,
-    yearly: 17900,
+    monthly: 9900,
+    yearly: 8250,
     listings: 'Unlimited',
     features: [
       { text: 'Unlimited service listings', ok: true },

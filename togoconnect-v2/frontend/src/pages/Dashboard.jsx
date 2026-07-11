@@ -51,6 +51,8 @@ export default function Dashboard() {
   const [billingStatus, setBillingStatus] = useState(null);
   const [billingHistory, setBillingHistory] = useState([]);
   const [trustData, setTrustData] = useState(null);
+  const [bookings, setBookings] = useState([]);
+  const [myBookings, setMyBookings] = useState([]);
 
   const refreshListings = () => {
     axios.get('/api/listings/my').then(r => {
@@ -67,6 +69,8 @@ export default function Dashboard() {
     axios.get('/api/billing').then(r => setBillingHistory(r.data)).catch(() => {});
     axios.get('/api/messages/unread-count').then(r => { setUnread(r.data.count||0); setUnreadMsgs(r.data.unread||0); }).catch(() => {});
     axios.get('/api/trust/my').then(r => setTrustData(r.data)).catch(() => {});
+    axios.get('/api/bookings?role=seller').then(r => setBookings(r.data)).catch(() => {});
+    axios.get('/api/bookings?role=client').then(r => setMyBookings(r.data)).catch(() => {});
   }, [user]);
 
   if (!user) return null;
@@ -79,6 +83,7 @@ export default function Dashboard() {
     ...(hasPlan ? [{ id:'billing', label:'Billing' }] : []),
     { id:'settings', label:'Settings' },
     { id:'trust', label:'Trust Score' },
+    { id:'bookings', label:'Bookings' },
     ...(!hasPlan ? [{ id:'plans', label:'Upgrade Plan' }] : []),
   ];
 
@@ -199,6 +204,7 @@ export default function Dashboard() {
         {tab==='settings' && <SettingsTab user={user} login={login} />}
         {tab==='billing' && <BillingTab billingStatus={billingStatus} billingHistory={billingHistory} />}
         {tab==='trust' && <TrustTab trustData={trustData} />}
+        {tab==='bookings' && <BookingsTab bookings={bookings} setBookings={setBookings} myBookings={myBookings} setMyBookings={setMyBookings} />}
         {tab==='plans' && !hasPlan && <PlansTab />}
       </div>
     </div>
@@ -209,9 +215,9 @@ export default function Dashboard() {
 function FreeOverviewTab({ user, unread, goTab }) {
   const navigate = useNavigate();
   const plans = [
-    { name:'Basic', price:2500, listings:'1 listing', color:'#6b7280', bg:'#f3f4f6' },
-    { name:'Standard', price:9900, listings:'10 listings', color:'#0f6e56', bg:'#ecfdf5', popular:true },
-    { name:'Premium', price:24900, listings:'Unlimited', color:'#7c3aed', bg:'#f5f3ff' },
+    { name:'Basic', price:500, listings:'1 listing', color:'#6b7280', bg:'#f3f4f6' },
+    { name:'Standard', price:4900, listings:'10 listings', color:'#0f6e56', bg:'#ecfdf5', popular:true },
+    { name:'Premium', price:9900, listings:'Unlimited', color:'#7c3aed', bg:'#f5f3ff' },
   ];
 
   return (
@@ -646,6 +652,23 @@ function SettingsTab({ user, login }) {
     finally { setSaving(false); }
   };
 
+  // Email change
+  const [emailForm, setEmailForm] = useState({ newEmail:'', confirmPassword:'' });
+  const [emailMsg, setEmailMsg] = useState('');
+  const [emailLoading, setEmailLoading] = useState(false);
+
+  const changeEmail = async () => {
+    if (!emailForm.newEmail || !emailForm.confirmPassword) { setEmailMsg('All fields required'); return; }
+    setEmailLoading(true);
+    try {
+      const { data } = await axios.put('/api/auth/change-email', { newEmail: emailForm.newEmail, password: emailForm.confirmPassword });
+      login({ ...user, ...data, token: user.token });
+      setEmailForm({ newEmail:'', confirmPassword:'' });
+      setEmailMsg('✅ Email updated successfully!');
+    } catch(err) { setEmailMsg(err.response?.data?.message || 'Failed to update email'); }
+    finally { setEmailLoading(false); }
+  };
+
   const savePassword = async () => {
     if (pwd.newPwd !== pwd.confirm) { showMsg('Passwords do not match', 'error'); return; }
     if (pwd.newPwd.length < 6) { showMsg('Password must be at least 6 characters', 'error'); return; }
@@ -659,23 +682,30 @@ function SettingsTab({ user, login }) {
   };
 
   const sections = [
-    { id:'profile', label:'Profile' },
-    { id:'password', label:'Password' },
-    { id:'account', label:'Account Info' },
+    { id:'profile', label:'Profile', icon:'👤' },
+    { id:'email', label:'Email', icon:'✉️' },
+    { id:'password', label:'Password', icon:'🔒' },
+    { id:'account', label:'Account Info', icon:'ℹ️' },
   ];
 
   return (
-    <div className='dash-settings-grid' style={{ display:'grid', gridTemplateColumns:'200px 1fr', gap:24, alignItems:'start' }}>
+    <div className='dash-settings-grid' style={{ display:'grid', gridTemplateColumns:'220px 1fr', gap:24, alignItems:'start' }}>
       {/* Sidebar */}
-      <div style={{ background:'#fff', border:'1px solid #e5e7eb', borderRadius:12, overflow:'hidden' }}>
+      <div style={{ background:'#fff', border:'1px solid #e5e7eb', borderRadius:14, overflow:'hidden', boxShadow:'0 1px 4px rgba(0,0,0,.04)' }}>
+        <div style={{ padding:'16px 18px', borderBottom:'1px solid #f3f4f6', background:'#fafafa' }}>
+          <div style={{ fontSize:11, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'.06em' }}>Settings</div>
+        </div>
         {sections.map(s => (
           <div key={s.id} onClick={() => setActiveSection(s.id)} style={{
-            padding:'12px 18px', cursor:'pointer', fontSize:14, fontWeight:activeSection===s.id?700:500,
+            padding:'13px 18px', cursor:'pointer', fontSize:14, fontWeight:activeSection===s.id?700:400,
             color:activeSection===s.id?'var(--green-dark)':'#374151',
             background:activeSection===s.id?'#f0fdf4':'#fff',
             borderLeft:`3px solid ${activeSection===s.id?'var(--green)':'transparent'}`,
-            borderBottom:'1px solid #f3f4f6'
-          }}>{s.label}</div>
+            borderBottom:'1px solid #f9fafb',
+            display:'flex', alignItems:'center', gap:10, transition:'all .15s'
+          }}>
+            <span style={{ fontSize:16 }}>{s.icon}</span> {s.label}
+          </div>
         ))}
       </div>
 
@@ -744,15 +774,44 @@ function SettingsTab({ user, login }) {
           </>
         )}
 
+        {/* Email section */}
+        {activeSection === 'email' && (
+          <>
+            <div style={{ marginBottom:24 }}>
+              <h3 style={{ fontSize:17, fontWeight:800, color:'#0f1923', marginBottom:4 }}>Change Email Address</h3>
+              <p style={{ fontSize:13, color:'#9ca3af' }}>Current email: <strong style={{ color:'#374151' }}>{user.email}</strong></p>
+            </div>
+            {emailMsg && (
+              <div style={{ background:emailMsg.startsWith('✅')?'#ecfdf5':'#fef2f2', border:`1px solid ${emailMsg.startsWith('✅')?'#86efac':'#fecaca'}`, borderRadius:8, padding:'12px 16px', fontSize:13, color:emailMsg.startsWith('✅')?'#0f6e56':'#dc2626', marginBottom:20, display:'flex', alignItems:'center', gap:8 }}>
+                {emailMsg}
+              </div>
+            )}
+            <Field label="New Email Address" type="email" value={emailForm.newEmail} onChange={e=>setEmailForm(f=>({...f,newEmail:e.target.value}))} placeholder="new@email.com" />
+            <Field label="Confirm with your Password" type="password" value={emailForm.confirmPassword} onChange={e=>setEmailForm(f=>({...f,confirmPassword:e.target.value}))} placeholder="Enter your current password" />
+            <div style={{ background:'#fefce8', border:'1px solid #fde68a', borderRadius:8, padding:'10px 14px', fontSize:12, color:'#92400e', marginBottom:20 }}>
+              ⚠️ A notification will be sent to your current email address after the change.
+            </div>
+            <button className="btn-primary" onClick={changeEmail} disabled={emailLoading||!emailForm.newEmail||!emailForm.confirmPassword} style={{ padding:'11px 32px', opacity:(!emailForm.newEmail||!emailForm.confirmPassword)?0.6:1 }}>
+              {emailLoading ? 'Updating...' : 'Update Email Address'}
+            </button>
+          </>
+        )}
+
         {/* Password section */}
         {activeSection === 'password' && (
           <>
-            <h3 style={{ fontSize:17, fontWeight:700, marginBottom:24, color:'#0f1923' }}>Change Password</h3>
+            <div style={{ marginBottom:24 }}>
+              <h3 style={{ fontSize:17, fontWeight:800, color:'#0f1923', marginBottom:4 }}>Change Password</h3>
+              <p style={{ fontSize:13, color:'#9ca3af' }}>Choose a strong password with at least 6 characters.</p>
+            </div>
             <Field label="Current Password" type="password" value={pwd.current} onChange={e=>setPwd(p=>({...p,current:e.target.value}))} placeholder="Enter current password" />
             <Field label="New Password" type="password" value={pwd.newPwd} onChange={e=>setPwd(p=>({...p,newPwd:e.target.value}))} placeholder="Min. 6 characters" />
             <Field label="Confirm New Password" type="password" value={pwd.confirm} onChange={e=>setPwd(p=>({...p,confirm:e.target.value}))} placeholder="Repeat new password" />
-            <button className="btn-primary" onClick={savePassword} disabled={saving||!pwd.current||!pwd.newPwd||!pwd.confirm} style={{ padding:'10px 28px' }}>
-              {saving ? 'Updating...' : 'Change password'}
+            {pwd.newPwd && pwd.confirm && pwd.newPwd !== pwd.confirm && (
+              <div style={{ fontSize:12, color:'#dc2626', marginBottom:16, marginTop:-10 }}>Passwords do not match</div>
+            )}
+            <button className="btn-primary" onClick={savePassword} disabled={saving||!pwd.current||!pwd.newPwd||!pwd.confirm||pwd.newPwd!==pwd.confirm} style={{ padding:'11px 32px', opacity:(saving||!pwd.current||!pwd.newPwd||!pwd.confirm)?0.6:1 }}>
+              {saving ? 'Updating...' : 'Change Password'}
             </button>
           </>
         )}
@@ -883,7 +942,7 @@ function PlansTab() {
   const plans = [
     { name:'Basic', price:2500, listings:1, features:['1 service listing','Unlimited messages','Reviews'] },
     { name:'Standard', price:9900, listings:10, features:['Up to 10 listings','Unlimited messages','Verified badge','Reviews'], popular:true },
-    { name:'Premium', price:24900, listings:'Unlimited', features:['Unlimited listings','Unlimited messages','Verified badge','Featured placement','Priority support'] },
+    { name:'Premium', price:9900, listings:'Unlimited', features:['Unlimited listings','Unlimited messages','Verified badge','Featured placement','Priority support'] },
   ];
   return (
     <div>
@@ -916,6 +975,214 @@ function PlansTab() {
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+// ── Bookings Tab ──
+function BookingsTab({ bookings, setBookings, myBookings, setMyBookings }) {
+  const [activeView, setActiveView] = useState('received');
+  const fmtDate = d => d ? new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '—';
+  const statusConfig = {
+    pending:   { color:'#92400e', bg:'#fefce8', border:'#fde68a', label:'Pending' },
+    accepted:  { color:'#065f46', bg:'#ecfdf5', border:'#6ee7b7', label:'Accepted' },
+    declined:  { color:'#991b1b', bg:'#fef2f2', border:'#fca5a5', label:'Declined' },
+    completed: { color:'#374151', bg:'#f3f4f6', border:'#d1d5db', label:'Completed' },
+  };
+
+  const updateStatus = async (id, status) => {
+    await axios.put(`/api/bookings/${id}`, { status });
+    setBookings(prev => prev.map(b => b.id===id ? {...b, status} : b));
+  };
+
+  // Parse message into structured fields
+  const parseMsg = (msg) => {
+    if (!msg) return {};
+    const lines = msg.split('\n');
+    const data = {};
+    lines.forEach(line => {
+      if (line.startsWith('Name: ')) data.name = line.replace('Name: ','');
+      else if (line.startsWith('Email: ')) data.email = line.replace('Email: ','');
+      else if (line.startsWith('Phone: ')) data.phone = line.replace('Phone: ','');
+      else if (line.startsWith('Date: ')) data.date = line.replace('Date: ','');
+      else if (line.startsWith('Time: ')) data.time = line.replace('Time: ','');
+    });
+    const reqIdx = msg.indexOf('Requirements:\n');
+    if (reqIdx > -1) data.requirements = msg.slice(reqIdx + 14).trim();
+    return data;
+  };
+
+  return (
+    <div>
+      {/* Tab switcher */}
+      <div style={{ display:'flex', gap:12, marginBottom:24, borderBottom:'2px solid #f3f4f6', paddingBottom:0 }}>
+        {[
+          { id:'received', label:'Received', count:bookings.length },
+          { id:'sent', label:'My Requests', count:(myBookings||[]).length },
+        ].map(t => (
+          <button key={t.id} onClick={() => setActiveView(t.id)}
+            style={{ padding:'10px 20px', border:'none', background:'transparent', cursor:'pointer', fontSize:14,
+              fontWeight:activeView===t.id?700:400, color:activeView===t.id?'#0f6e56':'#6b7280',
+              borderBottom:activeView===t.id?'2.5px solid #0f6e56':'2.5px solid transparent', marginBottom:-2 }}>
+            {t.label}
+            <span style={{ marginLeft:6, fontSize:12, fontWeight:700, padding:'2px 8px', borderRadius:100,
+              background:activeView===t.id?'#ecfdf5':'#f3f4f6', color:activeView===t.id?'#0f6e56':'#9ca3af' }}>
+              {t.count}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* Received bookings header stats */}
+      {activeView === 'received' && (
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
+          <p style={{ fontSize:13, color:'#9ca3af', margin:0 }}>{bookings.length} total request{bookings.length!==1?'s':''}</p>
+          <div style={{ display:'flex', gap:8 }}>
+            {['pending','accepted','declined'].map(s => (
+              <span key={s} style={{ fontSize:11, fontWeight:700, padding:'4px 10px', borderRadius:100,
+                background:statusConfig[s].bg, color:statusConfig[s].color, border:`1px solid ${statusConfig[s].border}` }}>
+                {bookings.filter(b=>(b.status||'').toLowerCase()===s).length} {statusConfig[s].label}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* My sent requests */}
+      {activeView === 'sent' && (
+        <div>
+          {(!myBookings||myBookings.length===0) ? (
+            <div style={{ textAlign:'center', padding:'48px 0', background:'#fff', borderRadius:16, border:'1px solid #e5e7eb' }}>
+              <div style={{ fontSize:40, marginBottom:12 }}>📤</div>
+              <div style={{ fontSize:15, fontWeight:700, color:'#0f1923', marginBottom:6 }}>No requests sent yet</div>
+              <div style={{ fontSize:13, color:'#9ca3af' }}>Browse services and click "Request a Meeting" to book</div>
+            </div>
+          ) : (myBookings||[]).map(b => {
+            const sc = statusConfig[(b.status||'').toLowerCase()] || statusConfig.pending;
+            const isNew = (b.status||'').toLowerCase() === 'accepted';
+            return (
+              <div key={b.id} style={{ background:'#fff', border:`1.5px solid ${isNew?'#6ee7b7':'#e5e7eb'}`, borderRadius:14, overflow:'hidden', marginBottom:14, boxShadow:isNew?'0 4px 16px rgba(22,163,74,.1)':'0 1px 4px rgba(0,0,0,.04)' }}>
+                {isNew && (
+                  <div style={{ background:'#ecfdf5', padding:'8px 20px', display:'flex', alignItems:'center', gap:8, fontSize:13, fontWeight:700, color:'#065f46', borderBottom:'1px solid #d1fae5' }}>
+                    <span style={{ fontSize:16 }}>🎉</span> Your meeting request has been accepted!
+                  </div>
+                )}
+                <div style={{ padding:'16px 20px', display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
+                  <div>
+                    <div style={{ fontWeight:700, fontSize:15, color:'#0f1923', marginBottom:3 }}>{b.seller_name}</div>
+                    {b.listing_title && <div style={{ fontSize:12, color:'#9ca3af' }}>Re: {b.listing_title}</div>}
+                    {b.meeting_date && <div style={{ fontSize:12, color:'#374151', marginTop:4 }}>📅 {new Date(b.meeting_date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</div>}
+                    <div style={{ fontSize:11, color:'#9ca3af', marginTop:6 }}>Sent {new Date(b.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</div>
+                  </div>
+                  <span style={{ fontSize:12, fontWeight:700, padding:'5px 14px', borderRadius:100, background:sc.bg, color:sc.color, border:`1.5px solid ${sc.border}`, whiteSpace:'nowrap' }}>
+                    {sc.label}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Received - existing list */}
+      {activeView !== 'sent' && <>
+
+      {bookings.length === 0 ? (
+        <div style={{ textAlign:'center', padding:'60px 0', background:'#fff', borderRadius:16, border:'1px solid #e5e7eb' }}>
+          <div style={{ fontSize:48, marginBottom:14 }}>📅</div>
+          <div style={{ fontSize:16, fontWeight:700, color:'#0f1923', marginBottom:6 }}>No meeting requests yet</div>
+          <div style={{ fontSize:13, color:'#9ca3af' }}>When clients request a meeting on your listings, they will appear here</div>
+        </div>
+      ) : bookings.map(b => {
+        const info = parseMsg(b.message);
+        const sc = statusConfig[b.status] || statusConfig.pending;
+        return (
+          <div key={b.id} style={{ background:'#fff', border:'1px solid #e5e7eb', borderRadius:14, overflow:'hidden', marginBottom:16, boxShadow:'0 1px 4px rgba(0,0,0,.04)' }}>
+
+            {/* Card header */}
+            <div style={{ padding:'16px 20px', borderBottom:'1px solid #f3f4f6', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+              <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+                <div style={{ width:40, height:40, borderRadius:'50%', background:'linear-gradient(135deg,#1D9E75,#0f6e56)', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontWeight:800, fontSize:16, flexShrink:0 }}>
+                  {(info.name||b.client_name||'?').charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <div style={{ fontWeight:700, fontSize:15, color:'#0f1923' }}>{info.name || b.client_name}</div>
+                  {b.listing_title && <div style={{ fontSize:12, color:'#9ca3af' }}>Re: {b.listing_title}</div>}
+                </div>
+              </div>
+              <span style={{ fontSize:12, fontWeight:700, padding:'5px 14px', borderRadius:100, background:sc.bg, color:sc.color, border:`1.5px solid ${sc.border}` }}>
+                {sc.label}
+              </span>
+            </div>
+
+            {/* Details grid */}
+            <div style={{ padding:'16px 20px' }}>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:12, marginBottom:14 }}>
+                {info.email && (
+                  <div style={{ background:'#f9fafb', borderRadius:8, padding:'10px 12px' }}>
+                    <div style={{ fontSize:10, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'.05em', marginBottom:3 }}>Email</div>
+                    <div style={{ fontSize:13, color:'#374151', fontWeight:500, wordBreak:'break-all' }}>{info.email}</div>
+                  </div>
+                )}
+                {info.phone && (
+                  <div style={{ background:'#f9fafb', borderRadius:8, padding:'10px 12px' }}>
+                    <div style={{ fontSize:10, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'.05em', marginBottom:3 }}>Phone</div>
+                    <div style={{ fontSize:13, color:'#374151', fontWeight:500 }}>{info.phone}</div>
+                  </div>
+                )}
+                {(info.date||b.meeting_date) && (
+                  <div style={{ background:'#ecfdf5', borderRadius:8, padding:'10px 12px', border:'1px solid #d1fae5' }}>
+                    <div style={{ fontSize:10, fontWeight:700, color:'#065f46', textTransform:'uppercase', letterSpacing:'.05em', marginBottom:3 }}>Date</div>
+                    <div style={{ fontSize:13, color:'#065f46', fontWeight:700 }}>{info.date || fmtDate(b.meeting_date)}</div>
+                    {info.time && <div style={{ fontSize:11, color:'#6b7280', marginTop:2 }}>{info.time}</div>}
+                  </div>
+                )}
+              </div>
+
+              {/* Requirements */}
+              {info.requirements && (
+                <div style={{ background:'#f9fafb', borderRadius:8, padding:'12px 14px', marginBottom:16, borderLeft:'3px solid var(--green)' }}>
+                  <div style={{ fontSize:11, fontWeight:700, color:'#9ca3af', textTransform:'uppercase', letterSpacing:'.05em', marginBottom:5 }}>Requirements</div>
+                  <div style={{ fontSize:13, color:'#374151', lineHeight:1.7 }}>{info.requirements}</div>
+                </div>
+              )}
+
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:10 }}>
+                <div style={{ fontSize:11, color:'#9ca3af' }}>Received {fmtDate(b.created_at)}</div>
+                <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+                  {(() => {
+                    const s = (b.status || '').toLowerCase().trim();
+                    if (s === 'accepted') return (
+                      <>
+                        <span style={{ fontSize:13, color:'#0f6e56', fontWeight:600 }}>✓ Accepted</span>
+                        <button onClick={() => updateStatus(b.id, 'completed')}
+                          style={{ padding:'8px 16px', background:'#fff', border:'1.5px solid #e5e7eb', borderRadius:8, color:'#6b7280', fontWeight:600, cursor:'pointer', fontSize:12 }}>
+                          Mark Complete
+                        </button>
+                      </>
+                    );
+                    if (s === 'declined') return <span style={{ fontSize:13, color:'#dc2626', fontWeight:600 }}>✗ Declined</span>;
+                    if (s === 'completed') return <span style={{ fontSize:13, color:'#6b7280', fontWeight:600 }}>✓ Completed</span>;
+                    return (
+                      <>
+                        <button onClick={() => updateStatus(b.id, 'accepted')}
+                          style={{ padding:'9px 24px', background:'#16a34a', border:'none', borderRadius:8, color:'#ffffff', fontWeight:800, cursor:'pointer', fontSize:13, boxShadow:'0 2px 8px rgba(22,163,74,.3)' }}>
+                          ✓ Accept
+                        </button>
+                        <button onClick={() => updateStatus(b.id, 'declined')}
+                          style={{ padding:'9px 18px', background:'#fef2f2', border:'1.5px solid #fca5a5', borderRadius:8, color:'#dc2626', fontWeight:700, cursor:'pointer', fontSize:13 }}>
+                          ✗ Decline
+                        </button>
+                      </>
+                    );
+                  })()}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </>}
     </div>
   );
 }

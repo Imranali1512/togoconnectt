@@ -19,6 +19,13 @@ router.post('/register', (req, res) => {
     const emailLower = email.toLowerCase().trim();
     const exists = db.prepare('SELECT id FROM users WHERE email = ?').get(emailLower);
     if (exists) return res.status(409).json({ message: 'An account with this email already exists. Please log in instead.' });
+    
+    // Phone uniqueness check
+    const { phone } = req.body;
+    if (phone && phone.trim()) {
+      const phoneExists = db.prepare('SELECT id FROM users WHERE phone = ? AND phone != ""').get(phone.trim());
+      if (phoneExists) return res.status(409).json({ message: 'This phone number is already linked to another account.' });
+    }
 
     const hashed = bcrypt.hashSync(password, 10);
     const result = db.prepare(
@@ -85,6 +92,48 @@ router.put('/password', protect, (req, res) => {
   } catch (err) {
     res.status(500).json({ message: 'Password update failed' });
   }
+});
+
+// ── PUT /api/auth/change-email ──
+router.put('/change-email', protect, async (req, res) => {
+  try {
+    const { newEmail, password } = req.body;
+    if (!newEmail || !password) return res.status(400).json({ message: 'Email and password required' });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) return res.status(400).json({ message: 'Invalid email format' });
+
+    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id);
+    if (!bcrypt.compareSync(password, user.password)) return res.status(401).json({ message: 'Incorrect password' });
+
+    const emailLower = newEmail.toLowerCase().trim();
+    if (emailLower === user.email) return res.status(400).json({ message: 'This is already your email' });
+
+    const exists = db.prepare('SELECT id FROM users WHERE email = ?').get(emailLower);
+    if (exists) return res.status(409).json({ message: 'This email is already in use by another account' });
+
+    db.prepare('UPDATE users SET email = ? WHERE id = ?').run(emailLower, req.user.id);
+
+    // Send notification to OLD email
+    if (process.env.SMTP_USER && process.env.SMTP_USER !== 'your-gmail@gmail.com') {
+      try {
+        const nodemailer = require('nodemailer');
+        const transporter = nodemailer.createTransport({ host: process.env.SMTP_HOST||'smtp.gmail.com', port:587, secure:false, auth:{ user:process.env.SMTP_USER, pass:process.env.SMTP_PASS } });
+        transporter.sendMail({
+          from: `"TogoConnect" <${process.env.SMTP_USER}>`,
+          to: user.email,
+          subject: 'Your TogoConnect email address was changed',
+          html: `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px">
+            <h2 style="color:#0f6e56">Email Address Changed</h2>
+            <p>Hi ${user.name},</p>
+            <p>Your TogoConnect email has been changed to <strong>${emailLower}</strong>.</p>
+            <p>If you did not make this change, please contact us immediately at <a href="mailto:hello@togoconnect.com">hello@togoconnect.com</a></p>
+          </div>`
+        }).catch(e => {});
+      } catch(e) {}
+    }
+
+    const updated = db.prepare('SELECT id, name, email, role, role_admin, plan, plan_expires_at, city, bio, avatar, phone, trust_score, restricted, restricted_until, restrict_count FROM users WHERE id = ?').get(req.user.id);
+    res.json({ ...updated, message: 'Email updated successfully' });
+  } catch(err) { res.status(500).json({ message: err.message }); }
 });
 
 // ── PUT /api/auth/plan ──

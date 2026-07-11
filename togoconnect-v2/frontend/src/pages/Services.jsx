@@ -29,6 +29,8 @@ export default function Services() {
   const [minRating, setMinRating] = useState(0);
   const [sortBy, setSortBy] = useState('relevant');
   const [showAllCats, setShowAllCats] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [showRentals, setShowRentals] = useState(false);
 
   useEffect(() => {
@@ -54,7 +56,24 @@ export default function Services() {
     );
   };
 
-  const handleSearch = () => setSearch(searchInput);
+  const handleSearch = () => { setSearch(searchInput); setShowSuggestions(false); };
+
+  // Live suggestions
+  const handleSearchInput = (val) => {
+    setSearchInput(val);
+    if (val.length >= 2) {
+      const lower = val.toLowerCase();
+      const cats = ['Plumbing','Beauty','Barber','Tutoring','Photography','Tech','Cleaning','Tailoring','Design','Moving','Electrical','House Rental','Apartment Rental','Land for Sale'];
+      const matched = cats.filter(c => c.toLowerCase().includes(lower));
+      setSuggestions(matched.slice(0,5));
+      setShowSuggestions(matched.length > 0);
+    } else {
+      setShowSuggestions(false);
+    }
+    // Real-time search after 400ms
+    clearTimeout(window._searchTimer);
+    window._searchTimer = setTimeout(() => setSearch(val), 400);
+  };
 
   const filtered = listings.filter(l => {
     if (selectedCategories.length > 0 && !selectedCategories.includes(l.category)) return false;
@@ -83,7 +102,7 @@ export default function Services() {
                 type="text"
                 placeholder="Search services..."
                 value={searchInput}
-                onChange={e => setSearchInput(e.target.value)}
+                onChange={e => handleSearchInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleSearch()}
                 style={{ flex: 1 }}
               />
@@ -92,6 +111,20 @@ export default function Services() {
               Search
             </button>
           </div>
+          {showSuggestions && (
+            <div style={{ position:'relative', zIndex:50 }}>
+              <div style={{ position:'absolute', top:4, left:0, right:80, background:'#fff', border:'1.5px solid #e5e7eb', borderRadius:10, boxShadow:'0 8px 24px rgba(0,0,0,.1)', overflow:'hidden' }}>
+                {suggestions.map(s => (
+                  <div key={s} onClick={() => { setSearchInput(s); setSearch(s); setShowSuggestions(false); }}
+                    style={{ padding:'11px 16px', cursor:'pointer', fontSize:14, color:'#374151', display:'flex', alignItems:'center', gap:10, borderBottom:'1px solid #f9fafb' }}
+                    onMouseEnter={e=>e.currentTarget.style.background='#f0fdf4'}
+                    onMouseLeave={e=>e.currentTarget.style.background='#fff'}>
+                    {s}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

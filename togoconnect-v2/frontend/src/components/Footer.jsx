@@ -70,7 +70,7 @@ export default function Footer() {
         </div>
 
         <div className="footer-bottom">
-          <span>© 2026 TogoConnect. All Rights Reserved. Built by <strong style={{ color:'#5DCAA5' }}>Qaim Systems</strong>.</span>
+          <span>© 2026 TogoConnect. All Rights Reserved. Built by <strong style={{ color:'#5DCAA5' }}><a href="https://hfdesignsllc.com/" target="_blank" rel="noreferrer" style={{ color:"#1D9E75", textDecoration:"none", fontWeight:700 }}>HF Design LLC</a></strong>.</span>
           <div className="footer-badge">
             <span className="footer-badge-dot"></span>
             All systems operational

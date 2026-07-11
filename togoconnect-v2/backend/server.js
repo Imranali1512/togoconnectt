@@ -23,6 +23,7 @@ app.use('/api/messages', require('./routes/messages'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/billing', require('./routes/billing'));
 app.use('/api/trust', require('./routes/trust'));
+app.use('/api/bookings', require('./routes/bookings'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/reports', require('./routes/reports'));
 

@@ -97,6 +97,8 @@ try { db.exec(`ALTER TABLE users ADD COLUMN restricted INTEGER DEFAULT 0`); } ca
 try { db.exec(`ALTER TABLE users ADD COLUMN restricted_until DATETIME`); } catch(e) {}
 try { db.exec(`ALTER TABLE reviews ADD COLUMN updated_at DATETIME`); } catch(e) {}
 try { db.exec(`ALTER TABLE users ADD COLUMN restrict_count INTEGER DEFAULT 0`); } catch(e) {}
+try { db.exec(`ALTER TABLE users ADD COLUMN phone TEXT DEFAULT ''`); } catch(e) {}
+try { db.exec(`CREATE TABLE IF NOT EXISTS bookings (id INTEGER PRIMARY KEY AUTOINCREMENT, client_id INTEGER NOT NULL, seller_id INTEGER NOT NULL, listing_id INTEGER, message TEXT, meeting_date TEXT, status TEXT DEFAULT 'pending', created_at DATETIME DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (client_id) REFERENCES users(id), FOREIGN KEY (seller_id) REFERENCES users(id))`); } catch(e) {}
 try { db.exec(`CREATE TABLE IF NOT EXISTS trust_events (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, event_type TEXT NOT NULL, description TEXT, points INTEGER NOT NULL, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (user_id) REFERENCES users(id))`); } catch(e) {}
 try { db.exec(`CREATE TABLE IF NOT EXISTS reports (id INTEGER PRIMARY KEY AUTOINCREMENT, reporter_id INTEGER NOT NULL, reported_user_id INTEGER, reported_listing_id INTEGER, reason TEXT NOT NULL, status TEXT DEFAULT 'pending', admin_note TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)`); } catch(e) {}
 try { db.exec(`ALTER TABLE users ADD COLUMN role_admin INTEGER DEFAULT 0`); } catch(e) {}

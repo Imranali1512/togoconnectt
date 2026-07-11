@@ -10,7 +10,21 @@ export const TOGO_LOCATIONS = {
       'Zio': ['Tsévié', 'Kévé'],
       'Bas-Mono': ['Afagnan'],
     },
-    cities: ['Lomé', 'Agoè-Nyivé', 'Tsévié', 'Aneho', 'Vogan', 'Tabligbo', 'Kévé', 'Afagnan', 'Togblekopé']
+    cities: [
+      // Lomé Neighbourhoods
+      'Lomé - Akodésséwa', 'Lomé - Abloganmé', 'Lomé - Bè', 'Lomé - Kpota',
+      'Lomé - Anfanmé', 'Lomé - Adakpamé', 'Lomé - Attiegou', 'Lomé - Kégué',
+      'Lomé - Hédzranawoé', 'Lomé - Nukafu', 'Lomé - Dekon', 'Lomé - Ahanoukopé',
+      'Lomé - Nyékonakpoè', 'Lomé - Kodjoviakopé', 'Lomé - Tokoin', 'Lomé - Cassablanca',
+      'Lomé - Gbonssimé', 'Lomé - Atikoumé', 'Lomé - Totsi', 'Lomé - Djidjoli',
+      'Lomé - Agbalépédo', 'Lomé - Avédji', 'Lomé - Agoè', 'Lomé - Adjidogomé',
+      'Lomé - Zanguera', 'Lomé - Adamavo', 'Lomé - Kagomé', 'Lomé - Kpogan',
+      'Lomé - Baguida', 'Lomé - Avépozo', 'Lomé - Agbavi', 'Lomé - Agbata',
+      'Lomé - Dagué', 'Lomé - Togo 2000', 'Lomé - Leo 2000', 'Lomé - Adidoadin',
+      'Lomé - Adewui',
+      // Other Maritime cities
+      'Agoè-Nyivé', 'Tsévié', 'Aneho', 'Vogan', 'Tabligbo', 'Kévé', 'Afagnan', 'Togblekopé'
+    ]
   },
   'Région des Plateaux': {
     provinces: {
@@ -62,7 +76,7 @@ export const ALL_REGIONS = Object.keys(TOGO_LOCATIONS);
 export const ALL_CITIES = [
   'Remote / Online',
   ...Object.values(TOGO_LOCATIONS).flatMap(r => r.cities)
-].sort();
+];
 
 export const getCitiesByRegion = (region) => {
   if (!region || region === 'All regions') return ALL_CITIES;
